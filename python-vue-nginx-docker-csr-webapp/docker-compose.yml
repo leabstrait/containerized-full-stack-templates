@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+    api1:
+        container_name: python-api1
+        hostname: pythonapi1
+        build:
+            context: "./api"
+            target: "build-stage"
+        environment:
+            - SERVICE_ID=api1
+        networks:
+            - backend-net
+
+    api2:
+        container_name: python-api2
+        hostname: pythonapi2
+        build:
+            context: "./api"
+            target: "build-stage"
+        environment:
+            - SERVICE_ID=api2
+        networks:
+            - backend-net
+
+    api3:
+        container_name: python-api3
+        hostname: pythonapi3
+        build:
+            context: "./api"
+            target: "build-stage"
+        environment:
+            - SERVICE_ID=api3
+        networks:
+            - backend-net
+
+    api4:
+        container_name: python-api4
+        hostname: pythonapi4
+        build:
+            context: "./api"
+            target: "build-stage"
+        environment:
+            - SERVICE_ID=api4
+        networks:
+            - backend-net
+
+    frontend1:
+        container_name: vue-frontend1
+        hostname: vuefrontend1
+        build:
+            context: "./frontend"
+            target: "build-stage"
+        volumes:
+            - shared-volume:/app/dist/
+
+    loadbalancer1:
+        container_name: nginx-loadbalancer1
+        hostname: nginxloadbalancer1
+        build:
+            context: ./loadbalancer
+        ports:
+            - "80:80"
+        volumes:
+            - shared-volume:/frontend/
+        depends_on:
+            - frontend1
+        networks:
+            - backend-net
+
+volumes:
+    shared-volume:
+
+
+networks:
+    backend-net:

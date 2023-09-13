@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+    wsserver1:
+        container_name: js-wsserver1
+        hostname: jswsserver1
+        build:
+            context: ./server # Specify the directory where the server Dockerfile is located
+        ports:
+            - "8081:8080" # Map container port to host port
+        networks:
+            - ws-network
+
+    wsserver2:
+        container_name: js-wsserver2
+        hostname: jswsserver2
+        build:
+            context: ./server # Specify the directory where the server Dockerfile is located
+        ports:
+            - "8082:8080" # Map container port to host port
+        networks:
+            - ws-network
+
+    wsserver3:
+        container_name: js-wsserver3
+        hostname: jswsserver3
+        build:
+            context: ./server # Specify the directory where the server Dockerfile is located
+        ports:
+            - "8083:8080" # Map container port to host port
+        networks:
+            - ws-network
+
+    wsserver4:
+        container_name: js-wsserver4
+        hostname: jswsserver4
+        build:
+            context: ./server # Specify the directory where the server Dockerfile is located
+        ports:
+            - "8084:8080" # Map container port to host port
+        networks:
+            - ws-network
+
+    wsclient1:
+        container_name: js-wsclient1
+        hostname: jswsclient1
+        build:
+            context: ./client # Specify the directory where the client Dockerfile is located
+        depends_on:
+            - wsserver1 # Ensure the server is running before starting the client
+            - wsserver2 # Ensure the server is running before starting the client
+            - wsserver3 # Ensure the server is running before starting the client
+            - wsserver4 # Ensure the server is running before starting the client
+        volumes:
+            - shared-volume:/app/
+        networks:
+            - ws-network
+
+    wsloadbalancer1:
+        container_name: nginx-wsloadbalancer1
+        hostname: nginxwsloadbalancer1
+        build:
+            context: ./loadbalancer
+        ports:
+            - "80:80"
+        volumes:
+            - shared-volume:/wsclient/
+        depends_on:
+            - wsclient1
+        networks:
+            - ws-network
+
+volumes:
+    shared-volume:
+
+networks:
+    ws-network:

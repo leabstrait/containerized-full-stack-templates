@@ -1,0 +1,7 @@
+Snake
+Horse
+Mouse
+Dog
+Cat
+Girrafe
+Bat

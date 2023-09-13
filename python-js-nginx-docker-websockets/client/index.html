@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSockets Client</title>
+</head>
+
+<body>
+    <h1>Hello Websockets</h1>
+
+    <div>
+        <button id="server1">Connect to Server 1</button>
+        <button id="server2">Connect to Server 2</button>
+        <button id="server3">Connect to Server 3</button>
+        <button id="server4">Connect to Server 4</button>
+        <button id="main">Connect to Main</button>
+        <button id="app1">Connect to App 1</button>
+        <button id="app2">Connect to App 2</button>
+    </div>
+
+    <div id="connectionStatus"></div>
+
+    <input type="text" name="message" id="message" placeholder="Type your message">
+    <button id="sendMessage">Send Message</button>
+
+    <div id="response"></div>
+
+    <script>
+        const serverURLs = {
+            server1: "ws://localhost:8081",
+            server2: "ws://localhost:8082",
+            server3: "ws://localhost:8083",
+            server4: "ws://localhost:8084",
+            main: "ws://localhost/main",
+            app1: "ws://localhost/app1",
+            app2: "ws://localhost/app2"
+        };
+
+        let currentConnection = null;
+
+        function connectToServer(serverId) {
+            if (currentConnection) {
+                currentConnection.close();
+            }
+
+            const serverURL = serverURLs[serverId];
+
+            try {
+                const connection = new WebSocket(serverURL);
+
+                connection.onopen = () => {
+                    document.getElementById('connectionStatus').textContent = `Connected to: ${serverURL}`;
+                    currentConnection = connection;
+                };
+
+                connection.onmessage = (event) => {
+                    const responseDiv = document.getElementById('response');
+                    responseDiv.innerHTML += `<p>Received: ${event.data}</p>`;
+                };
+
+                connection.onerror = (err) => {
+                    console.error(err)
+                }
+
+                connection.onclose = () => {
+                    document.getElementById('connectionStatus').textContent = 'Connection closed';
+                    currentConnection = null;
+                };
+            }
+            catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.getElementById('server1').addEventListener('click', () => connectToServer('server1'));
+        document.getElementById('server2').addEventListener('click', () => connectToServer('server2'));
+        document.getElementById('server3').addEventListener('click', () => connectToServer('server3'));
+        document.getElementById('server4').addEventListener('click', () => connectToServer('server4'));
+        document.getElementById('main').addEventListener('click', () => connectToServer('main'));
+        document.getElementById('app1').addEventListener('click', () => connectToServer('app1'));
+        document.getElementById('app2').addEventListener('click', () => connectToServer('app2'));
+
+        document.getElementById('sendMessage').addEventListener('click', () => {
+            const message = document.getElementById('message').value;
+            if (currentConnection && message) {
+                currentConnection.send(message);
+                document.getElementById('message').value = '';
+            }
+        });
+    </script>
+</body>
+
+</html>
